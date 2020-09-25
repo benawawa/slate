@@ -1,15 +1,8 @@
 ---
-title: API Reference
+title: Canopeo API Reference
 
 language_tabs: # must be one of https://git.io/vQNgJ
-  - shell
-  - ruby
-  - python
-  - javascript
-
-toc_footers:
-  - <a href='#'>Sign Up for a Developer Key</a>
-  - <a href='https://github.com/slatedocs/slate'>Documentation Powered by Slate</a>
+  - shell: cURL
 
 includes:
   - errors
@@ -21,221 +14,286 @@ code_clipboard: true
 
 # Introduction
 
-Welcome to the Kittn API! You can use our API to access Kittn API endpoints, which can get information on various cats, kittens, and breeds in our database.
+Replacement for the Canopeo backend, written in Node.JS.
 
-We have language bindings in Shell, Ruby, Python, and JavaScript! You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.
+# Status
 
-This example API documentation page was created with [Slate](https://github.com/slatedocs/slate). Feel free to edit it and use it as a base for your own API's documentation.
+```shell
+curl https://canopeoapp.com/canopeo/api/v1/status
+```
+> Response
+
+```shell
+ONLINE
+```
+
+This route fetches the online status of the API.
 
 # Authentication
 
-> To authorize, use this code:
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-```
+## Obtaining a Token
 
 ```shell
-# With shell, you can just pass the correct header with each request
-curl "api_endpoint_here"
-  -H "Authorization: meowmeowmeow"
+curl --header "Content-Type: application/json" --request POST \
+--data '{"username":"your_username","password":"your_password"}' \
+https://canopeoapp.com/canopeo/api/v1/api-token-auth
 ```
 
-```javascript
-const kittn = require('kittn');
+> Response:
 
-let api = kittn.authorize('meowmeowmeow');
+```json
+{
+  "token":  "v13pGiSaKUwWh1RWaWy8G8Nzbafgv_ZrQ"
+}
 ```
 
-> Make sure to replace `meowmeowmeow` with your API key.
+To access the Canopeo API, you will need an **access token**. To obtain one, make a cURL like the following:
 
-Kittn uses API keys to allow access to the API. You can register a new Kittn API key at our [developer portal](http://example.com/developers).
+### HTTP Request
 
-Kittn expects for the API key to be included in all API requests to the server in a header that looks like the following:
+`POST /api-token-auth`
 
-`Authorization: meowmeowmeow`
-
-<aside class="notice">
-You must replace <code>meowmeowmeow</code> with your personal API key.
-</aside>
-
-# Kittens
-
-## Get All Kittens
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get()
-```
+## Resetting Password:
 
 ```shell
-curl "http://example.com/api/kittens"
-  -H "Authorization: meowmeowmeow"
+curl --header "Content-Type: application/json" --request POST --data '{"email":"your_email"}' \
+https://canopeoapp.com/canopeo/api/v1/reset
 ```
 
-```javascript
-const kittn = require('kittn');
+> The result is a Password Request Email being sent to you. After the email containing the token arrives, do the following:
 
-let api = kittn.authorize('meowmeowmeow');
-let kittens = api.kittens.get();
+```shell
+curl https://canopeoapp.com/canopeo/api/v1/rest/your_token
 ```
 
-> The above command returns JSON structured like this:
+> Response:
+
+```html
+The password for <username> has been reset. Your new password is:
+
+<password>
+
+Once you log in using this password, you may update it to something else.
+```
+
+This route requests a password reset token. Email must be added.
+
+### HTTP Request:
+
+`POST /reset` OR `POST /reset/1/set_password`
+
+### THEN
+
+`GET /reset/<token>`
+
+# User
+
+## Getting Users
+
+```shell
+curl --header "Authorization: Bearer your_access_token" https://canopeoapp.com/canopeo/api/v1/users
+```
+
+> Response:
 
 ```json
 [
   {
-    "id": 1,
-    "name": "Fluffums",
-    "breed": "calico",
-    "fluffiness": 6,
-    "cuteness": 7
-  },
+    "id":00000,
+    "username":"name",
+    "email":"name@example.com",
+    "first_name":"first_name",
+    "last_name":"last_name",
+    "time_joined":"2020-05-26T21:31:03.000Z",
+    "last_login":"2020-09-24T17:16:06.000Z",
+    "is_active":true,
+    "is_superuser":0,
+    "is_staff":false,
+    "extra_security":true,
+    "created_at":"2020-05-26T21:31:03.000Z",
+    "updated_at":"2020-09-24T17:16:06.000Z"
+  }
+]
+
+```
+
+This route fetches user information. If you are a superuser, it returns all users in the system.
+
+### HTTP Request:
+
+`GET /users`
+
+## Updating Users
+
+```shell
+curl --header "Authorization: Bearer your_access_token" --request PUT \
+--data '{"first_name": "fistName", "last_name": "lastName", "email": "email@example.com"}' \
+https://canopeoapp.com/canopeo/api/v1/users/<id>
+
+```
+
+> Response
+
+```json
+[
   {
-    "id": 2,
-    "name": "Max",
-    "breed": "unknown",
-    "fluffiness": 5,
-    "cuteness": 10
+    "id":00000,
+    "username":"name",
+    "email":"name@example.com",
+    "first_name":"first_name",
+    "last_name":"last_name",
+    "time_joined":"2020-05-26T21:31:03.000Z",
+    "last_login":"2020-09-24T17:16:06.000Z",
+    "is_active":true,
+    "is_superuser":0,
+    "is_staff":false,
+    "extra_security":true,
+    "created_at":"2020-05-26T21:31:03.000Z",
+    "updated_at":"2020-09-24T17:16:06.000Z"
+  }
+]
+
+```
+
+This route updates a user's information. Must be authenticated.
+
+### HTTP Request: 
+
+`PUT /users/<id>`
+
+# Fields
+
+## Fetching Fields
+
+```shell
+curl "Authorization: Bearer your_access_token" https://canopeoapp.com/canopeo/api/v1/fields
+```
+
+> Response                                                                                                                                                                                                                                   
+
+```json
+[
+  {
+    "id":"id"                                                                                                                                                                                                                                    "name":"field_name"                                                                                                                                                                                                                          "user_id":"user_id"                                                                                                                                                                                                                          "created_at":"createdAt"                                                                                                                                                                                                                     "updated_at":"updatedAt"                                                                                                                                                                                                                   }
+]
+```
+
+This route fetches a user's fields. Must be authenticated.
+
+### HTTP Request:
+
+`GET /fields`
+
+# Folders
+
+## Fetching Folders
+
+```shell
+curl "Authorization: Bearer your_access_token" https://canopeoapp.com/canopeo/api/v1/folders
+```
+
+> Response
+
+```json
+[
+  {
+    "id":"id"
+    "name":"folder_name"
+    "user_id":"user_id"
+    "created_at":"createdAt"
+    "updated_at":"updatedAt"
   }
 ]
 ```
 
-This endpoint retrieves all kittens.
+This route fetches a user's folders. Must be authenticated.
 
-### HTTP Request
+### HTTP Request:
 
-`GET http://example.com/api/kittens`
+`GET /folders`
 
-### Query Parameters
+# Canopeo Data
 
-Parameter | Default | Description
---------- | ------- | -----------
-include_cats | false | If set to true, the result will also include cats.
-available | true | If set to false, the result will include kittens that have already been adopted.
+## Fetching Canopeo Data
 
-<aside class="success">
-Remember — a happy kitten is an authenticated kitten!
-</aside>
-
-## Get a Specific Kitten
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get(2)
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get(2)
-```
-
-```shell
-curl "http://example.com/api/kittens/2"
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.get(2);
-```
-
-> The above command returns JSON structured like this:
+> Canopeo Data Object:
 
 ```json
-{
-  "id": 2,
-  "name": "Max",
-  "breed": "unknown",
-  "fluffiness": 5,
-  "cuteness": 10
-}
+[
+  {
+    "id":00000,
+    "data_id":00000,
+    "owner_id":00000,
+    "owner":"firstName",
+    "folder_id":00000,
+    "project_folder":,
+    "field_id":00000,
+    "field_name":"fieldName",
+    "date_time":"date",
+    "planting_date":"plantDate",
+    "canopy_cover":0,
+    "adjustments":0,
+    "latitude":0,
+    "longitude":0,
+    "vegetation_type":"Wheat",
+    "vegetation_height":0,
+    "variety":"Yellow",
+    "tillage":0,
+    "notes":null,
+    "device":"iOS",
+    "original_image":"image.jpg",
+    "processed_image":"image_processed.jpg", 
+    "thumbnail_image":"image_thumb.jpg",
+    "video":null,
+    "video_rotation":null,
+    "created_at":"date",
+    "updated_at":"date",
+  }
+]
 ```
 
-This endpoint retrieves a specific kitten.
+This route fetches Canopeo Data for a user. Must be Authenticated.
 
-<aside class="warning">Inside HTML code blocks like this one, you can't use Markdown, so use <code>&lt;code&gt;</code> blocks to denote code.</aside>
+### HTTP Request:
 
-### HTTP Request
+`GET /canopeo/<id>`
 
-`GET http://example.com/kittens/<ID>`
+## Uploading Canopeo Data
 
-### URL Parameters
+This route uploads Canopeo Data to the database for a user. Must be Authenticated.
 
-Parameter | Description
---------- | -----------
-ID | The ID of the kitten to retrieve
+### HTTP Request:
 
-## Delete a Specific Kitten
+`POST /canopeo/<id>`
 
-```ruby
-require 'kittn'
+## Deleting Canopeo Data
 
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.delete(2)
-```
+This route deletes Canopeo Data for user. Must be Authenticated.
 
-```python
-import kittn
+### HTTP Request:
 
-api = kittn.authorize('meowmeowmeow')
-api.kittens.delete(2)
-```
+`DELETE /canopeo/data/<id>`
 
-```shell
-curl "http://example.com/api/kittens/2"
-  -X DELETE
-  -H "Authorization: meowmeowmeow"
-```
+# Export
 
-```javascript
-const kittn = require('kittn');
+## Exporting Canopeo Data
 
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.delete(2);
-```
+These routes export Canopeo Data for a user. Must be Authenticated.
 
-> The above command returns JSON structured like this:
+### HTTP Request:
 
-```json
-{
-  "id": 2,
-  "deleted" : ":("
-}
-```
+`GET /export` **OR** `GET /canopeo/0/download_user_data`
 
-This endpoint deletes a specific kitten.
+# Statistics
 
-### HTTP Request
+## Server Statistics
 
-`DELETE http://example.com/kittens/<ID>`
+This route fetches current server statistics. Must be Authenticated and Superuser.
 
-### URL Parameters
+### HTTP Request: 
 
-Parameter | Description
---------- | -----------
-ID | The ID of the kitten to delete
+`GET /stats`
 
+## Total Server Statistics
+
+This route fetches the total server statistics. Must be Authenticated and Superuser.
