@@ -174,7 +174,11 @@ curl "Authorization: Bearer your_access_token" https://canopeoapp.com/canopeo/ap
 ```json
 [
   {
-    "id":"id"                                                                                                                                                                                                                                    "name":"field_name"                                                                                                                                                                                                                          "user_id":"user_id"                                                                                                                                                                                                                          "created_at":"createdAt"                                                                                                                                                                                                                     "updated_at":"updatedAt"                                                                                                                                                                                                                   }
+    "id":"id",                                                          "name":"field_name",
+    "user_id":"user_id",
+    "created_at":"createdAt",
+    "updated_at":"updatedAt",
+  }
 ]
 ```
 
@@ -288,6 +292,20 @@ These routes export Canopeo Data for a user. Must be Authenticated.
 
 ## Server Statistics
 
+```json
+[
+  {
+    date_time: "2020-07-25T06:00:01.000Z"
+    free_size_gb: 523485011968
+    number_pictures: 203558
+    number_users: 21644
+    number_videos: 1248
+    usage_percent: 45.33241204818938
+    used_size_gb: 532330512384
+  }
+]
+```
+
 This route fetches current server statistics. Must be Authenticated and Superuser.
 
 ### HTTP Request: 
@@ -296,4 +314,21 @@ This route fetches current server statistics. Must be Authenticated and Superuse
 
 ## Total Server Statistics
 
-This route fetches the total server statistics. Must be Authenticated and Superuser.
+```json
+[
+  {
+    androidNum: 67906,
+    dateTime: "2020-07-25T06:00:01.000Z",
+    id: 189728230,
+    iosNum: 113990,
+    sizeAndroid: 65833870456,
+    sizeIos: 181272092181,
+    sizePictures: 247105962637,
+    sizeVideos: 14121393012,
+  }
+]
+```
+
+`GET /total_server_stats`
+
+This route fetches the total server statistics. Must be Authenticated and Superuser. The Full Return object is omitted on account of being 8000+ rows.
